@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<fsm name="Ruberto.com MBT Demo">
+	<states>
+		<state name="custState" oracle="Customers">
+			<transition name="management" input="tag-link-12" next="mgmtState" />
+			<transition name="automation" input="tag-link-3" next="autoState" />
+		</state>
+		<state name="mgmtState" oracle="Management">
+			<transition name="automation" input="tag-link-3" next="autoState" />
+			<transition name="customers" input="tag-link-9" next="custState" />
+		</state>
+		<state name="autoState" oracle="Test Automation">
+      			<transition name="automation" input="tag-link-3" next="autoState" />
+     			<transition name="customers"  input="tag-link-9" next="custState" />
+      			<transition name="management" input="tag-link-12" next="mgmtState" />
+		</state>
+	</states>
+</fsm>

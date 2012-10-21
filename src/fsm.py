@@ -20,28 +20,37 @@ getNext(transition) method (which returns a stateName after taking the transitio
 getTransistions(state) method (which returns the available transitions for that state)
 '''
 import unittest
-
+from xml.dom.minidom import parse, Node
 
 class Fsm:
-    def __init__(self,file=None):
-        if not file :
+    def __init__(self,f=None):
+        if not f :
             self.mach = ['default' , [ ['s1' , 'ors1', [['test','t1a1','s2']]],        #temp, intent is to read from the filename
                                        ['s2' , 'ors2', [['test','t2a1','s2'],
                                                         ['test','t2a2','s1']]] ]]
-        if file == "demo" :
-            self.mach = ['ruberto.com', [ ['custState', 'Customers', [['management', 'tag-link-12', 'mgmtState' ],
-                                                                      ['automation', 'tag-link-3', 'autoState' ] ] ],
-                                          ['mgmtState', 'Management', [['automation', 'tag-link-3', 'autoState' ],
-                                                                        ['customers', 'tag-link-9', 'custState' ] ]],
-                                          ['autoState', 'Test Automation', [['automation', 'tag-link-3', 'autoState' ],
-                                                                             ['customers', 'tag-link-9', 'custState' ],
-                                                                             ['management', 'tag-link-12', 'mgmtState' ] ]] ] ]
-                                        
+        
+        else: 
+            if f == "demo" :
+                self.mach = ['Ruberto.com MBT Demo', [ ['custState', 'Customers', [['management', 'tag-link-12', 'mgmtState' ],
+                                                                                   ['automation', 'tag-link-3', 'autoState' ] ] ],
+                                                      ['mgmtState', 'Management', [['automation', 'tag-link-3', 'autoState' ],
+                                                                                   ['customers', 'tag-link-9', 'custState' ] ]],
+                                                      ['autoState', 'Test Automation', [['automation', 'tag-link-3', 'autoState' ],
+                                                                                        ['customers', 'tag-link-9', 'custState' ],
+                                                                                        ['management', 'tag-link-12', 'mgmtState' ] ]] ] ]            
+            else :           # f contains the filename of the file
+                self.mach = []
+                fsmtree = parse(f)
+                self.mach.append(str(fsmtree.getElementsByTagName('fsm')[0].getAttribute("name")))   #fsm name
+                self.mach.append([])                     #list of states
+                scount = 0
+                for s in fsmtree.getElementsByTagName("state") :
+                    self.mach[1].append([str(s.getAttribute("name")), str(s.getAttribute("oracle"))])
+                    self.mach[1][scount].append([])      #list of transitions
+                    for t in s.getElementsByTagName("transition") :               
+                        self.mach[1][scount][2].append([str(t.getAttribute("name")), str(t.getAttribute("input")),str(t.getAttribute("next"))])
+                    scount += 1
             
-        else:
-            self.mach = ['TODOreadfromfile' , [ ['s1' ,'ors1', [['test' ,'t1a1' ,'s2']]] ,    
-                                                ['s2' ,'ors2', [['test' ,'t2a1' ,'s2'],
-                                                                ['test' ,'t2a2' ,'s1']]] ]]
         self.currentState = self.mach[1][0][0]                      #initialize to the first state
        
     def get_current_state_list (self):
@@ -88,19 +97,31 @@ class Fsm:
 class TestFsm (unittest.TestCase):
     def setUp(self):
         self.test_d = Fsm()
+        pass
+    
+    def testFileImport(self):
+        self.testDemoMach = Fsm('demo')       #template machine
+        self.testFile = Fsm("rubertoDemo.xml")   # the real file
+        print "constructed FSM is: ", self.testFile.mach
+        self.assertEqual(self.testDemoMach.mach,self.testFile.mach)
+        pass
+    
         
     def test_initial_state(self):
         self.assertEqual(self.test_d.currentState, 's1')
+        pass
     
     def test_get_next_state(self):
         self.assertEqual(self.test_d.get_next_state('t1a1'), 's2')
+        pass
         
     def test_get_trans_list(self):
         self.assertEqual(self.test_d.get_trans_list('s1'), [['test','t1a1','s2']] )
+        pass
         
     def test_demo(self):
         self.test_ruberto = Fsm('demo')
-        self.assertEqual(self.test_ruberto.mach[0], 'ruberto.com')
+        self.assertEqual(self.test_ruberto.mach[0], 'Ruberto.com MBT Demo')
         self.assertEqual(self.test_ruberto.currentState,'custState')
         self.assertEqual(self.test_ruberto.get_next_state('tag-link-12'),'mgmtState')
         nextstate = self.test_ruberto.set_next_state('tag-link-12')
@@ -108,15 +129,8 @@ class TestFsm (unittest.TestCase):
         self.assertEqual(self.test_ruberto.get_current_state_oracle(),'Management')
         nextstate = self.test_ruberto.set_next_state('tag-link-3')
         self.assertEqual(self.test_ruberto.get_current_state_oracle(),'Test Automation')
-        
-        
-#test = Fsm()
-#print test.currentState
-#print test.mach
-#print test.get_current_state_list()
-#print test.get_next_state('t1a1')
-#print test.get_trans_list(test.currentState)
-
+        pass
+    
 
 if __name__ == '__main__':
     unittest.main()

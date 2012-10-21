@@ -5,7 +5,7 @@ generate test cases based on walking through a finite state machine
 import fsm
 from random import choice
 
-demo = fsm.Fsm('demo')
+demo = fsm.Fsm('rubertoDemo.xml')                    #generates a FSM from xml file
 
 #putting text_file in global scope for now. TODO refactor
 text_file = open("demo.py", "w")
@@ -17,7 +17,7 @@ def test_setup():
     text_file.write("#demo.py, automatically generated webdriver code\n")
     text_file.write("from selenium import webdriver\n")
     text_file.write("driver = webdriver.Firefox()\n")
-    text_file.write("driver.get(\"http://blog.ruberto.com\")\n")
+    text_file.write("driver.get(\"http://blog.ruberto.com\")\n")         #should read this from the fsm xml file
     
     return
 
@@ -57,9 +57,13 @@ def random_walk(m, n):
         index += 1
     return
 
+'''
+The meat of this demo
+calls to a setup: creates the header information and sets up the tests
 
+'''
 test_setup()
-random_walk(demo, 5)
+random_walk(demo, 10)
 test_teardown()
 
 

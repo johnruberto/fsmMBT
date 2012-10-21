@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.python.pydev.pythonNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/rubertoDemo.xml</name>
+			<type>1</type>
+			<location>/Users/john/Documents/workspace/fsmMBT/src/rubertoDemo.xml</location>
+		</link>
+	</linkedResources>
 </projectDescription>
